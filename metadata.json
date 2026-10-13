@@ -1,0 +1,6 @@
+{
+  "name": "MNSID Digital Solutions - Digital Ebook Store",
+  "description": "Premium, verified digital ebooks for students, beginners, professionals, and entrepreneurs with instant secure downloads, interactive sample previews, and automated email delivery.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
