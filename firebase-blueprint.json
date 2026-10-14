@@ -1,0 +1,88 @@
+{
+  "entities": {
+    "ProjectLibrary": {
+      "title": "ProjectLibrary",
+      "description": "Studio Project Library database location (Local Disk, Network Host, or Studio Cloud)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["local", "network", "cloud"] },
+        "path": { "type": "string" },
+        "size": { "type": "string" },
+        "projectCount": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "type", "path"]
+    },
+    "ProjectItem": {
+      "title": "ProjectItem",
+      "description": "Studio video editing project with timeline tracks, color grading, fusion VFX and audio",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "libraryId": { "type": "string" },
+        "resolution": { "type": "string" },
+        "fps": { "type": "number" },
+        "duration": { "type": "number" },
+        "modifiedAt": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "thumbnail": { "type": "string" },
+        "clipsCount": { "type": "number" },
+        "tracksCount": { "type": "number" },
+        "colorManaged": { "type": "boolean" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "name", "libraryId", "resolution", "fps"]
+    },
+    "AiVideoGeneration": {
+      "title": "AiVideoGeneration",
+      "description": "AI-generated video and text-to-video render record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "prompt": { "type": "string" },
+        "model": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "thumbnail": { "type": "string" }
+      },
+      "required": ["id", "prompt", "model", "timestamp", "videoUrl"]
+    },
+    "BioscienceAnalysis": {
+      "title": "BioscienceAnalysis",
+      "description": "DeepMind AlphaFold protein and bioscience research data record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uniprotId": { "type": "string" },
+        "gene": { "type": "string" },
+        "meanPlddt": { "type": "number" },
+        "pdbUrl": { "type": "string" },
+        "cifUrl": { "type": "string" },
+        "summary": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "uniprotId", "gene"]
+    }
+  },
+  "firestore": {
+    "/projectLibraries/{libraryId}": {
+      "schema": { "$ref": "#/entities/ProjectLibrary" },
+      "description": "Collection of user-created and studio project libraries"
+    },
+    "/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/ProjectItem" },
+      "description": "Collection of video editing projects and timelines"
+    },
+    "/aiGenerations/{generationId}": {
+      "schema": { "$ref": "#/entities/AiVideoGeneration" },
+      "description": "Collection of AI text-to-video generated clips"
+    },
+    "/bioscienceAnalysis/{analysisId}": {
+      "schema": { "$ref": "#/entities/BioscienceAnalysis" },
+      "description": "Collection of AlphaFold protein and bioscience exploration records"
+    }
+  }
+}

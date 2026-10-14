@@ -1,194 +1,122 @@
-import React, { useState, useMemo } from 'react';
-import { StoreProvider, useStore } from './context/StoreContext';
+import React, { useEffect } from 'react';
+import { EditorProvider, useEditor } from './context/EditorContext';
 import { Header } from './components/Header';
-import { HeroBanner } from './components/HeroBanner';
-import { AudienceFilterBar } from './components/AudienceFilterBar';
-import { EbookCard } from './components/EbookCard';
-import { BookReaderModal } from './components/BookReaderModal';
-import { EbookDetailModal } from './components/EbookDetailModal';
-import { CartDrawer } from './components/CartDrawer';
-import { CheckoutModal } from './components/CheckoutModal';
-import { OrderSuccessModal } from './components/OrderSuccessModal';
-import { EmailDeliveryModal } from './components/EmailDeliveryModal';
-import { UserDashboardModal } from './components/UserDashboardModal';
-import { SupportModal } from './components/SupportModal';
-import { TrustGuaranteeSection } from './components/TrustGuaranteeSection';
-import { Footer } from './components/Footer';
+import { BottomPageSwitcher } from './components/BottomPageSwitcher';
+import { MediaPage } from './components/pages/MediaPage';
+import { EditPage } from './components/pages/EditPage';
+import { FusionPage } from './components/pages/FusionPage';
+import { ColourPage } from './components/pages/ColourPage';
+import { FairlightPage } from './components/pages/FairlightPage';
+import { DeliveryPage } from './components/pages/DeliveryPage';
+import { AiLabPage } from './components/pages/AiLabPage';
+import { ProjectLibraryPage } from './components/pages/ProjectLibraryPage';
+import { QuickExportModal } from './components/Modals/QuickExportModal';
+import { ShortcutsModal } from './components/Modals/ShortcutsModal';
 import { ToastContainer } from './components/ToastContainer';
-import { 
-  Sparkles, 
-  HelpCircle, 
-  Search, 
-  GraduationCap, 
-  Briefcase, 
-  BookOpen,
-  ArrowUp
-} from 'lucide-react';
 
-const StoreContent: React.FC = () => {
+const EditorLayout: React.FC = () => {
   const {
-    filteredEbooks,
-    selectedAudience,
-    setSelectedAudience,
-    selectedCategory,
-    openSupport,
-  } = useStore();
+    activePage,
+    setActivePage,
+    returnToProjectManager,
+    togglePlayPause,
+    splitClipAtPlayhead,
+    deleteSelectedClip,
+    setSelectedTool,
+    setIsShortcutsModalOpen,
+    seekTo,
+    currentTime
+  } = useEditor();
 
-  const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high' | 'rating'>('popular');
+  // Keyboard shortcut listener for studio editing
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in input or textarea
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) {
+        return;
+      }
 
-  // Sorted ebooks
-  const sortedEbooks = useMemo(() => {
-    const list = [...filteredEbooks];
-    if (sortBy === 'rating') {
-      return list.sort((a, b) => b.rating - a.rating);
-    }
-    if (sortBy === 'price-low') {
-      return list.sort((a, b) => a.price - b.price);
-    }
-    if (sortBy === 'price-high') {
-      return list.sort((a, b) => b.price - a.price);
-    }
-    // Default 'popular'
-    return list.sort((a, b) => b.reviewsCount - a.reviewsCount);
-  }, [filteredEbooks, sortBy]);
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlayPause();
+      } else if (e.key === 'b' || e.key === 'B') {
+        if (e.metaKey || e.ctrlKey) {
+          e.preventDefault();
+          splitClipAtPlayhead();
+        } else {
+          setSelectedTool('blade');
+        }
+      } else if (e.key === 'a' || e.key === 'A') {
+        setSelectedTool('select');
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        deleteSelectedClip();
+      } else if (e.key === 'j' || e.key === 'J') {
+        seekTo(Math.max(0, currentTime - 1.5));
+      } else if (e.key === 'k' || e.key === 'K') {
+        togglePlayPause();
+      } else if (e.key === 'l' || e.key === 'L') {
+        seekTo(currentTime + 1.5);
+      } else if (e.key === '?' || (e.key === '/' && (e.metaKey || e.ctrlKey))) {
+        setIsShortcutsModalOpen(true);
+      } else if (e.shiftKey) {
+        if (e.key === '1') returnToProjectManager();
+        if (e.key === '2') setActivePage('media');
+        if (e.key === '4') setActivePage('edit');
+        if (e.key === '5') setActivePage('fusion');
+        if (e.key === '6') setActivePage('colour');
+        if (e.key === '7') setActivePage('fairlight');
+        if (e.key === '8') setActivePage('delivery');
+        if (e.key === '9') setActivePage('ai');
+      }
+    };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [togglePlayPause, splitClipAtPlayhead, deleteSelectedClip, setSelectedTool, setIsShortcutsModalOpen, seekTo, currentTime, setActivePage, returnToProjectManager]);
+
+  // If on Project Library page, render full Studio Project Manager view
+  if (activePage === 'project-manager') {
+    return (
+      <div className="h-screen w-screen flex flex-col bg-[#0f1013] text-gray-100 overflow-hidden font-sans select-none antialiased">
+        <ProjectLibraryPage />
+        <ToastContainer />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
-      {/* Top Header */}
+    <div className="h-screen w-screen flex flex-col bg-[#0f1013] text-gray-100 overflow-hidden font-sans select-none antialiased">
+      {/* Top Studio Header */}
       <Header />
 
-      {/* Hero Banner */}
-      <HeroBanner />
-
-      {/* Filter and Sort Toolbar */}
-      <AudienceFilterBar sortBy={sortBy} setSortBy={setSortBy} />
-
-      {/* Main E-Book Catalog */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
-        {/* Active Section Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                {selectedCategory === 'UI/UX Design'
-                  ? '🎨 Best-Selling UI/UX Design & Design System E-Books'
-                  : selectedAudience === 'students'
-                  ? 'E-Books for Students & Beginners (16–24)'
-                  : selectedAudience === 'professionals'
-                  ? 'Playbooks for Professionals & Founders (25–40)'
-                  : 'Curated Digital Publications'}
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              {selectedCategory === 'UI/UX Design'
-                ? 'Master Figma 5.0, multi-tier design tokens, micro-interactions, psychology, and design-to-code workflows with included Figma templates.'
-                : selectedAudience === 'students'
-                ? 'High-impact coding, UI/UX design, AI prompting, freelancing, and study tactics with 20% student discounts (STUDENT20).'
-                : selectedAudience === 'professionals'
-                ? 'Enterprise design systems, conversion optimization, SaaS finance, and executive productivity.'
-                : 'All titles are verified 2026 editions, DRM-free with instant PDF, EPUB, and MOBI format delivery.'}
-            </p>
-          </div>
-
-          {/* Quick Segment Switcher Pill */}
-          <div className="inline-flex rounded-xl bg-slate-200/80 p-1 text-xs font-semibold shrink-0">
-            <button
-              onClick={() => setSelectedAudience('all')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                selectedAudience === 'all'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setSelectedAudience('students')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                selectedAudience === 'students'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <GraduationCap className="w-3.5 h-3.5" /> Students
-            </button>
-            <button
-              onClick={() => setSelectedAudience('professionals')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                selectedAudience === 'professionals'
-                  ? 'bg-emerald-700 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Briefcase className="w-3.5 h-3.5" /> Founders
-            </button>
-          </div>
-        </div>
-
-        {/* E-Books Grid */}
-        {sortedEbooks.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 p-8 shadow-xs">
-            <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-slate-900">No matching ebooks found</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-              We couldn&apos;t find any books matching your current search or category filter. Try resetting your filters to explore our full library.
-            </p>
-            <button
-              onClick={() => setSelectedAudience('all')}
-              className="mt-5 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition-colors cursor-pointer shadow-xs"
-            >
-              Show All Ebooks
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {sortedEbooks.map((ebook) => (
-              <EbookCard key={ebook.id} ebook={ebook} />
-            ))}
-          </div>
-        )}
+      {/* Main Studio Viewport (Dynamically switches active workflow page) */}
+      <main className="flex-1 flex overflow-hidden relative">
+        {activePage === 'media' && <MediaPage />}
+        {activePage === 'edit' && <EditPage />}
+        {activePage === 'fusion' && <FusionPage />}
+        {activePage === 'colour' && <ColourPage />}
+        {activePage === 'fairlight' && <FairlightPage />}
+        {activePage === 'delivery' && <DeliveryPage />}
+        {activePage === 'ai' && <AiLabPage />}
       </main>
 
-      {/* Trust & Guarantee Section */}
-      <TrustGuaranteeSection />
+      {/* Iconic Bottom Studio Workflow Page Switcher */}
+      <BottomPageSwitcher />
 
-      {/* Footer */}
-      <Footer />
-
-      {/* Floating Quick Support Button */}
-      <div className="fixed bottom-6 left-6 z-30">
-        <button
-          onClick={openSupport}
-          className="bg-slate-900 hover:bg-slate-800 text-white p-3 sm:px-4 sm:py-3 rounded-full sm:rounded-2xl shadow-xl flex items-center gap-2 text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 border border-slate-700"
-          title="Need Help or FAQs?"
-        >
-          <HelpCircle className="w-4 h-4 text-indigo-400" />
-          <span className="hidden sm:inline">24/7 Reader Support &amp; FAQs</span>
-        </button>
-      </div>
-
-      {/* Modals & Overlays */}
-      <BookReaderModal />
-      <EbookDetailModal />
-      <CartDrawer />
-      <CheckoutModal />
-      <OrderSuccessModal />
-      <EmailDeliveryModal />
-      <UserDashboardModal />
-      <SupportModal />
+      {/* Modals & Feedback Notifications */}
+      <QuickExportModal />
+      <ShortcutsModal />
       <ToastContainer />
     </div>
   );
 };
 
-export default function App() {
+export function App() {
   return (
-    <StoreProvider>
-      <StoreContent />
-    </StoreProvider>
+    <EditorProvider>
+      <EditorLayout />
+    </EditorProvider>
   );
 }
+
+export default App;

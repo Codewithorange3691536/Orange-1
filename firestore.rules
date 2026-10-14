@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Project Libraries
+    match /projectLibraries/{libraryId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.name is string && request.resource.data.type in ['local', 'network', 'cloud'];
+      allow delete: if true;
+    }
+
+    // Projects
+    match /projects/{projectId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.name is string;
+      allow delete: if true;
+    }
+
+    // AI Generations
+    match /aiGenerations/{generationId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.prompt is string;
+      allow delete: if true;
+    }
+
+    // Bioscience Analysis
+    match /bioscienceAnalysis/{analysisId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.uniprotId is string;
+      allow delete: if true;
+    }
+
+    // Test connection doc
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}
