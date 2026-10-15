@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { EditorProvider, useEditor } from './context/EditorContext';
 import { Header } from './components/Header';
+import { ArtlistNav } from './components/ArtlistNav';
 import { BottomPageSwitcher } from './components/BottomPageSwitcher';
 import { MediaPage } from './components/pages/MediaPage';
 import { EditPage } from './components/pages/EditPage';
@@ -85,7 +86,9 @@ const EditorLayout: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-[#0f1013] text-gray-100 overflow-hidden font-sans select-none antialiased">
+    <div className="h-screen w-screen flex flex-col bg-[#0f1013] text-gray-100 font-sans select-none antialiased">
+      {/* Artlist AI Inspired Top Navigation & Dropdowns */}
+      <ArtlistNav />
       {/* Top Studio Header */}
       <Header />
 

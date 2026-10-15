@@ -1,6 +1,6 @@
 {
-  "name": "MNSID Digital Solutions - Digital Ebook Store",
-  "description": "Premium, verified digital ebooks for students, beginners, professionals, and entrepreneurs with instant secure downloads, interactive sample previews, and automated email delivery.",
+  "name": "Greate Editing - Studio Video Editor & AI Science Lab",
+  "description": "Professional studio video editor and AI science lab. Features Dual Monitors, Multi-Track timeline, Fusion VFX, Color Grading, Fairlight Audio console with visual waveform sync analyzer, and Veo 3 / MiniMax H3 AI generation.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

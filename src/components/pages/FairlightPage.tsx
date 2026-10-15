@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useEditor } from '../../context/EditorContext';
 import { SOUND_FX_LIBRARY } from '../../data/sampleClips';
+import { AudioWaveformAnalyzer } from '../AudioWaveformAnalyzer';
 
 export const FairlightPage: React.FC = () => {
   const {
@@ -24,6 +25,9 @@ export const FairlightPage: React.FC = () => {
     masterMuted,
     setMasterMuted,
     isPlaying,
+    currentTime,
+    setCurrentTime,
+    duration,
     addClipToTimeline,
     showToast
   } = useEditor();
@@ -48,24 +52,23 @@ export const FairlightPage: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#101115] text-gray-200 select-none">
-      {/* Top Half: 4-Band Parametric EQ & Dynamics Visualizer */}
-      <div className="h-[44%] flex border-b border-[#232630] bg-[#0c0d10]">
+      {/* Top Half: Parametric EQ & Visual Audio Waveform Analyzer */}
+      <div className="h-[46%] flex border-b border-[#232630] bg-[#0c0d10] gap-2 p-2 overflow-hidden">
         {/* Parametric EQ Frequency Curve */}
-        <div className="flex-1 flex flex-col p-3 border-r border-[#232630]">
+        <div className="w-1/2 flex flex-col p-3 bg-[#13151d] rounded-lg border border-[#20232c]">
           <div className="flex items-center justify-between text-xs pb-1.5 border-b border-[#1f222b]">
             <span className="font-bold text-gray-300 flex items-center gap-1.5">
               <Activity className="w-3.5 h-3.5 text-cyan-400" />
-              Fairlight 4-Band Parametric Equalizer ({selectedChannel?.name || 'A1'})
+              Fairlight 4-Band Parametric EQ ({selectedChannel?.name || 'A1'})
             </span>
             <div className="flex items-center gap-2 text-[11px] font-mono text-gray-400">
               <button
-                onClick={() => showToast(`AI Voice Isolation activated on ${selectedChannel?.name || 'A1'}: Background rumble, AC hum and room reverb eliminated`)}
+                onClick={() => showToast(`AI Voice Isolation activated on ${selectedChannel?.name || 'A1'}: Background rumble and reverb eliminated`)}
                 className="px-2.5 py-0.5 rounded bg-gradient-to-r from-cyan-950 to-blue-950 border border-cyan-500/50 text-cyan-300 font-sans text-[11px] font-semibold flex items-center gap-1 hover:brightness-125 transition-all shadow-xs active:scale-95"
               >
                 <Sparkles className="w-3 h-3 text-cyan-400" />
                 <span>AI Voice Isolation</span>
               </button>
-              <span className="text-emerald-400 font-semibold">48.000 kHz 24-bit</span>
             </div>
           </div>
 
@@ -170,36 +173,18 @@ export const FairlightPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamics & Sound FX Library Tab */}
-        <div className="w-80 bg-[#14161c] flex flex-col text-xs">
-          <div className="h-9 border-b border-[#232630] px-3 flex items-center justify-between bg-[#181a22]">
-            <span className="font-bold text-gray-200 uppercase tracking-wider flex items-center gap-1.5">
-              <Music className="w-3.5 h-3.5 text-cyan-400" />
-              Sound FX Library
-            </span>
-            <span className="text-[10px] text-gray-400 font-mono">Insert to A2</span>
-          </div>
-
-          <div className="flex-1 p-2.5 overflow-y-auto space-y-1.5">
-            {SOUND_FX_LIBRARY.map((sfx) => (
-              <div
-                key={sfx.id}
-                onClick={() => handleInsertSfx(sfx)}
-                className="p-2 bg-[#1b1e26] hover:bg-[#252935] rounded border border-[#2a2e3b] cursor-pointer flex items-center justify-between transition-colors group"
-              >
-                <div>
-                  <p className="text-gray-200 font-medium group-hover:text-cyan-400">{sfx.name}</p>
-                  <p className="text-[10px] text-gray-500 font-mono">
-                    {sfx.category} • {sfx.duration}
-                  </p>
-                </div>
-                <button className="p-1 rounded bg-[#252935] text-cyan-400 group-hover:bg-cyan-500 group-hover:text-black transition-colors">
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
-          </div>
+        {/* Visual Audio Waveform Synchronizer Analyzer */}
+        <div className="flex-1 flex flex-col p-3 bg-[#13151d] rounded-lg border border-[#20232c] overflow-hidden">
+          <AudioWaveformAnalyzer
+            trackName={selectedChannel?.name || 'A1 Track'}
+            duration={duration}
+            currentTime={currentTime}
+            isPlaying={isPlaying}
+            onSeek={(t) => setCurrentTime(t)}
+            height={195}
+          />
         </div>
+
       </div>
 
       {/* Bottom Half: Multi-Channel Console Strips */}

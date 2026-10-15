@@ -32,6 +32,7 @@ import {
 import { useEditor } from '../../context/EditorContext';
 import { LUT_PRESETS } from '../../data/sampleClips';
 import { createMediaItemFromFile } from '../../utils/mediaUtils';
+import { AudioWaveformAnalyzer } from '../AudioWaveformAnalyzer';
 
 export const EditPage: React.FC = () => {
   const {
@@ -69,7 +70,7 @@ export const EditPage: React.FC = () => {
     showToast
   } = useEditor();
 
-  const [activeTab, setActiveTab] = useState<'transitions' | 'titles' | 'media' | 'ai'>('transitions');
+  const [activeTab, setActiveTab] = useState<'transitions' | 'titles' | 'media' | 'ai' | 'audio'>('transitions');
   const [quickAiPrompt, setQuickAiPrompt] = useState('Cinematic 8K drone shot sweeping over futuristic Tokyo neon skyscrapers in rain');
   const [zoomLevel, setZoomLevel] = useState<number>(35); // pixels per second
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -355,7 +356,19 @@ export const EditPage: React.FC = () => {
               }`}
             >
               <Sparkles className="w-3 h-3 text-fuchsia-400" />
-              <span>AI Tools</span>
+              <span>AI</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('audio')}
+              className={`px-2 py-1 text-[11px] font-semibold rounded flex items-center gap-1 ${
+                activeTab === 'audio'
+                  ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-700/50'
+                  : 'text-gray-400 hover:text-emerald-300'
+              }`}
+              title="Audio Waveform Sync Analyzer"
+            >
+              <Volume2 className="w-3 h-3 text-emerald-400" />
+              <span>Audio</span>
             </button>
           </div>
 
@@ -534,6 +547,23 @@ export const EditPage: React.FC = () => {
                   <Sparkles className="w-3.5 h-3.5 text-fuchsia-400" />
                   <span>Open Full AI & Science Lab</span>
                 </button>
+              </div>
+            )}
+
+            {activeTab === 'audio' && (
+              <div className="space-y-3">
+                <span className="text-[10px] text-gray-400 uppercase font-semibold">Audio Waveform & Sync</span>
+                <AudioWaveformAnalyzer
+                  trackName="Master Audio / A1"
+                  duration={duration}
+                  currentTime={currentTime}
+                  isPlaying={isPlaying}
+                  onSeek={(t) => setCurrentTime(t)}
+                  height={130}
+                />
+                <p className="text-[10px] text-gray-400">
+                  Inspect audio waveform peaks to visually align video cuts with speech and transient beats.
+                </p>
               </div>
             )}
           </div>
