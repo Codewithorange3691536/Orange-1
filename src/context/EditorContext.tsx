@@ -866,12 +866,12 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       type: 'video',
       url: newGen.videoUrl,
       thumbnail: newGen.thumbnail,
-      duration: isVeo ? 16.0 : 8.0,
+      duration: 600.0, // 10 minutes duration as requested
       category: 'Cinematic',
       resolution: params.aspectRatio === '9:16' ? '1080 x 1920 (9:16)' : '3840 x 2160 (4K)',
       fps: 60,
       codec: isVeo ? 'Veo 3 Neural HEVC' : 'MiniMax H3 Neural MP4',
-      fileSize: isVeo ? '112 MB' : '68 MB'
+      fileSize: '1.2 GB (10m 4K UHD)'
     };
 
     setMediaLibrary((prev) => [mediaItem, ...prev]);
